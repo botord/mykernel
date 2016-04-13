@@ -9,16 +9,19 @@
 #endif
 #define MAX_TASK_NUM 4
 #define KERNEL_STACK_SIZE 1024*8
+
 struct Thread {
     unsigned long eip;
     unsigned long esp;
 };
+
 typedef struct pcb {
     int pid;
-    volatile long stat;            /* -1: unrunnable, 0: runnable, >0: stopped */
+    volatile unsigned int stat;            /* -1: unrunnable, 0: runnable, >0: stopped */
     char stack[KERNEL_STACK_SIZE];
     struct Thread thread;
     unsigned long task_entry;
     struct pcb *next;
 } PCB;
+
 void my_schedule(void);

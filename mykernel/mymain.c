@@ -96,9 +96,10 @@ void __init my_start_kernel(void)
 
     for(i = 1; i < MAX_TASK_NUM; i++) {
         memcpy(&task[i], &task[0], sizeof(PCB));
-        task[i].pid = pid;
+        task[i].pid = i;
         task[i].stat = -1;
-        task[i].thread.esp = (unsigned long)&task[pid].stack[KERNEL_STACK_SIZE-1];
+        task[i].thread.esp = (unsigned long)&task[i].stack[KERNEL_STACK_SIZE-1];
+        task[i].next = task[i-1].next;
         task[i-1].next = &task[i];
     }
     
@@ -119,17 +120,17 @@ void __init my_start_kernel(void)
 
 void my_process(void)
 {
-    int i = 0;
+    long i = 0;
     while (1) {
         i++;
-        if (i%100000 == 0) {
-            printk(KERN_NOTICE "this is process %d\n", my_current_task->pid);
+        if (i%100000000 == 0) {
+            printk(KERN_NOTICE "my_process: this is process %d\n", my_current_task->pid);
             if(need_sched == 1) {
                 /* need_sched will be enabled by timer_interrupt() automatically. */
                 need_sched = 0;
                 my_schedule();
             }
-            printk(KERN_NOTICE "this is process %d\n", my_current_task->pid);
+            printk(KERN_NOTICE "my_process: this is process %d\n", my_current_task->pid);
         }
     }
 
